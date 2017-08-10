@@ -1,0 +1,28 @@
+#myForm {
+  width: 300px;
+  margin: 100px auto;
+}
+
+#myForm button,
+#myForm input {
+  box-sizing: border-box;
+  padding: 8px;
+  width: 350px;
+}
+
+#myForm input {
+  display: block;
+  margin: 10px 0;
+}
+
+#myForm button {
+  border: none;
+  background: #eee;
+  cursor: pointer;
+  outline: none;
+  transition: background .2s;
+}
+
+#myForm button:hover {
+  background: #dedede;
+}

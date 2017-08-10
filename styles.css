@@ -15,6 +15,10 @@
   margin: 10px 0;
 }
 
+#myForm input.error {
+  border: 1px solid red;
+}
+
 #myForm button {
   border: none;
   background: #eee;

@@ -18,24 +18,37 @@ MyForm.prototype.validate = function() {
   let inputs = Array.from(this.form.querySelectorAll("input"));
   for (let i = 0; i < inputs.length; i++) {
     switch (inputs[i].getAttribute("name")) {
-      case "fio":
-        // Валидируем имя
+      case "fio": // Валидируем имя
         let arrNames = inputs[i].value.split(" ").filter(el => {
           return el.replace(/[^A-Za-zА-Яа-яё]/gim, "");
         });
         if (arrNames.length == 3) {
-          // Отправляем успех
+          inputs[i].classList.remove("error");
         } else {
-          // Отдаём ошибку
+          if (inputs[i].classList) inputs[i].classList.add("error");
+          else inputs[i].className = "error";
+          console.log("У вас ошибка в поле ФИО");
         }
         break;
-      case "email":
-        // Валидируем почту
-
+      case "email": // Валидируем почту
+        let emails = [
+            "ya.ru",
+            "yandex.ru",
+            "yandex.ua",
+            "yandex.by",
+            "yandex.kz",
+            "yandex.com"
+          ],
+          regularEmailChecker = /^(([^<>()\[\]\\.,;:\s@"]+(\.[^<>()\[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
+        if (!regularEmailChecker.test(inputs[i].value.replace(" ", ""))) {
+          if (inputs[i].classList) inputs[i].classList.add("error");
+          else inputs[i].className = "error";
+          console.log("У вас ошибка в поле Email");
+        }
         break;
       case "phone":
         // Валидируем телефон
-
+        console.log("У вас ошибка в поле телефон");
         break;
       default:
         break;

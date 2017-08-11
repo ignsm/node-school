@@ -1,7 +1,12 @@
 // Глобальный объект MyForm
 function MyForm(id) {
   this.form = document.getElementById(id);
-  this.button = this.form.querySelectorAll("#submitButton")[0];
+  this.inputFio = this.form.querySelector("input[name='fio']");
+  this.inputEmail = this.form.querySelector("input[name='email']");
+  this.inputPhone = this.form.querySelector("input[name='phone']");
+  this.isValid = true;
+  this.errorFields = [];
+  this.button = this.form.querySelector("#submitButton");
   this.button.onclick = () => {
     this.submit();
   };
@@ -14,46 +19,36 @@ function MyForm(id) {
 // submit() => undefined
 
 MyForm.prototype.validate = function() {
-  // Обрабатываем инпуты
-  let inputs = Array.from(this.form.querySelectorAll("input"));
-  for (let i = 0; i < inputs.length; i++) {
-    switch (inputs[i].getAttribute("name")) {
-      case "fio": // Валидируем имя
-        this.nameValidation(inputs[i]);
-        break;
-      case "email": // Валидируем почту
-        this.emailValidation(inputs[i]);
-        break;
-      case "phone": // Валидируем телефон
-        this.phoneValidate(inputs[i]);
-        break;
-      default:
-        break;
-    }
-  }
+  let data = this.getData();
+  this.nameValidation(data.fio);
+  this.emailValidation(data.email);
+  this.phoneValidation(data.phone);
+  return { isValid: this.isValid, errorFields: this.errorFields };
 };
 
-// Функция показа ошибки
-function throwError(el) {
+// Функция вызова ошибки
+MyForm.prototype.throwError = function(el) {
+  this.isValid = false;
+  this.errorFields.push(el.name);
   if (el.classList) el.classList.add("error");
   else el.className = "error";
   return 0;
-}
+};
 
 // Функция обработки ФИО
-MyForm.prototype.nameValidation = function(el) {
-  let arrNames = el.value.split(" ").filter(el => {
+MyForm.prototype.nameValidation = function(str) {
+  let arrNames = str.split(" ").filter(el => {
     return el.replace(/[^A-Za-zА-Яа-яё]/gim, "");
   });
   if (arrNames.length == 3) {
-    el.classList.remove("error");
+    //
   } else {
-    throwError(el);
+    this.throwError(this.inputFio);
   }
 };
 
 // Функция обработки Email
-MyForm.prototype.emailValidation = function(el) {
+MyForm.prototype.emailValidation = function(str) {
   let emails = [
       "ya.ru",
       "yandex.ru",
@@ -63,48 +58,67 @@ MyForm.prototype.emailValidation = function(el) {
       "yandex.com"
     ],
     regularEmailChecker = /^(([^<>()\[\]\\.,;:\s@"]+(\.[^<>()\[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
-  if (regularEmailChecker.test(el.value.replace(" ", ""))) {
-    let mailProvider = el.value.split("@");
+  if (regularEmailChecker.test(str.replace(" ", ""))) {
+    let mailProvider = str.split("@");
     let flag = 0;
     for (let j = 0; j < emails.length; j++) {
       if (emails[j] == mailProvider[1]) {
-        el.classList.remove("error");
+        // убрать класс ошибки
         break;
       } else {
         flag++;
       }
     }
-    if (flag == emails.length) throwError(el);
+    if (flag == emails.length) this.throwError(this.inputEmail); // Выкинуть ошибку;
   } else {
-    throwError(el);
+    this.throwError(this.inputEmail);
   }
+  return 0;
 };
 
 // Маска ввода телефона
-var phoneNumber = new PhoneMask(document.getElementById("phoneMask"), {
+var phoneNumber = new PhoneMask(document.getElementById("phone_mask"), {
   pattern: "+7(___)___-__-__",
   patternChar: "_",
   allowedRegExp: /^\d$/
 });
 
 // Валидируем номер телефона
-MyForm.prototype.phoneValidate = function(el) {
-  let numArray = el.value.replace(/[^0-9]/gim, "").split(""),
+MyForm.prototype.phoneValidation = function(str) {
+  let numArray = str.replace(/[^0-9]/gim, "").split(""),
     sumNum = 0;
   if (numArray.length == 11) {
     for (var k = 0; k < numArray.length; k++) {
       sumNum += +numArray[k];
     }
     if (sumNum > 30) {
-      throwError(el);
+      this.throwError(this.inputPhone);
     }
   } else {
-    throwError(el);
+    this.throwError(this.inputPhone);
+  }
+};
+
+// Получаем данные с формы
+MyForm.prototype.getData = function() {
+  let formData = {},
+    inputs = Array.from(this.form.querySelectorAll("input"));
+  for (let i = 0; i < inputs.length; i++) {
+    formData[inputs[i].name] = inputs[i].value;
+  }
+  return formData;
+};
+
+MyForm.prototype.setData = function(obj) {
+  let inputs = Array.from(this.form.querySelectorAll("input"));
+  for (let i = 0; i < inputs.length; i++) {
+    formData[inputs[i].name] = inputs[i].value;
   }
 };
 
 MyForm.prototype.submit = function() {
   this.validate();
+  this.getData();
 };
 
 let a = new MyForm("myForm");

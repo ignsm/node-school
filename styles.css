@@ -23,11 +23,11 @@
 
 #myForm button {
   border: none;
-  background: #eee;
+  background: #ffdb4d;
   cursor: pointer;
   transition: background .2s;
 }
 
 #myForm button:hover {
-  background: #dedede;
+  background: #f5d24a;
 }

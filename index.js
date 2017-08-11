@@ -1,5 +1,16 @@
+// Маска ввода телефона
+var phoneNumber = new PhoneMask(document.getElementById("phoneMask"), {
+  pattern: "+7(___)___-__-__",
+  patternChar: "_",
+  allowedRegExp: /^\d$/
+});
+
 function MyForm(id) {
   this.form = document.getElementById(id);
+  this.button = this.form.querySelectorAll("#submitButton");
+  this.button[0].onclick = () => {
+    this.submit();
+  };
 }
 
 // При отправке формы должна срабатывать валидация полей по следующим правилам:
@@ -13,6 +24,12 @@ function MyForm(id) {
 // setData(Object) => undefined
 // submit() => undefined
 
+function throwError(el) {
+  if (el.classList) el.classList.add("error");
+  else el.className = "error";
+  return 0;
+}
+
 MyForm.prototype.validate = function() {
   // Обрабатываем инпуты
   let inputs = Array.from(this.form.querySelectorAll("input"));
@@ -25,9 +42,7 @@ MyForm.prototype.validate = function() {
         if (arrNames.length == 3) {
           inputs[i].classList.remove("error");
         } else {
-          if (inputs[i].classList) inputs[i].classList.add("error");
-          else inputs[i].className = "error";
-          console.log("У вас ошибка в поле ФИО");
+          throwError(inputs[i]);
         }
         break;
       case "email": // Валидируем почту
@@ -40,15 +55,39 @@ MyForm.prototype.validate = function() {
             "yandex.com"
           ],
           regularEmailChecker = /^(([^<>()\[\]\\.,;:\s@"]+(\.[^<>()\[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
-        if (!regularEmailChecker.test(inputs[i].value.replace(" ", ""))) {
-          if (inputs[i].classList) inputs[i].classList.add("error");
-          else inputs[i].className = "error";
-          console.log("У вас ошибка в поле Email");
+        if (regularEmailChecker.test(inputs[i].value.replace(" ", ""))) {
+          let mailProvider = inputs[i].value.split("@");
+          let flag = 0;
+          for (let j = 0; j < emails.length; j++) {
+            if (emails[j] == mailProvider[1]) {
+              inputs[i].classList.remove("error");
+              break;
+            } else {
+              flag++;
+            }
+          }
+          if (flag == emails.length) throwError(inputs[i]);
+        } else {
+          throwError(inputs[i]);
         }
         break;
       case "phone":
         // Валидируем телефон
-        console.log("У вас ошибка в поле телефон");
+        let numArray = inputs[i].value.replace(/[^0-9]/gim, "").split(""),
+          sumNum = 0;
+        for (var k = 0; k < numArray.length; k++) {
+          sumNum += numArray[k];
+        }
+        if (numArray.length == 11) {
+          for (var k = 0; k < numArray.length; k++) {
+            sumNum += numArray[k];
+          }
+          if (sumNum < 30) {
+            throwError(inputs[i]);
+          }
+        } else {
+          throwError(inputs[i]);
+        }
         break;
       default:
         break;
@@ -56,5 +95,8 @@ MyForm.prototype.validate = function() {
   }
 };
 
+MyForm.prototype.submit = function() {
+  this.validate();
+};
+
 let a = new MyForm("myForm");
-a.validate();

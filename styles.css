@@ -8,11 +8,13 @@
   box-sizing: border-box;
   padding: 8px;
   width: 350px;
+  outline: none;
 }
 
 #myForm input {
   display: block;
   margin: 10px 0;
+  border: 1px solid #aaa;
 }
 
 #myForm input.error {
@@ -23,7 +25,6 @@
   border: none;
   background: #eee;
   cursor: pointer;
-  outline: none;
   transition: background .2s;
 }
 

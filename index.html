@@ -10,14 +10,16 @@
 <body>
   <form id="myForm" action="index.html" method="post">
     <input type="text" name="fio" placeholder="ФИО">
-    <input type="text" name="email" placeholder="Email" value="ignat@yandex.ru">
-    <input type="text" name="phone" placeholder="Номер телефона">
-    <button type="submit" id="submitButton" name="button">Отправить</button>
+    <input type="text" name="email" placeholder="Email">
+    <input type="text" name="phone" id="phoneMask" placeholder="Номер телефона">
+    <button type="button" id="submitButton" name="button">Отправить</button>
     <div id="resultContainer">
 
     </div>
   </form>
 
+
+  <script src="mask.js" charset="utf-8"></script>
   <script src="index.js" charset="utf-8"></script>
 </body>
 </html>

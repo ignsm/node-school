@@ -4,9 +4,10 @@ function MyForm(id) {
   this.inputFio = this.form.querySelector("input[name='fio']");
   this.inputEmail = this.form.querySelector("input[name='email']");
   this.inputPhone = this.form.querySelector("input[name='phone']");
+  this.button = this.form.querySelector("#submitButton");
+  this.resultContainer = this.form.querySelector("#resultContainer");
   this.isValid = true;
   this.errorFields = [];
-  this.button = this.form.querySelector("#submitButton");
   this.button.onclick = () => {
     this.submit();
   };
@@ -24,8 +25,15 @@ MyForm.prototype.validate = function() {
 MyForm.prototype.throwError = function(el) {
   this.isValid = false;
   this.errorFields.push(el.name);
-  if (el.classList) el.classList.add("error");
-  else el.className = "error";
+  el.classList.add("error");
+  return 0;
+};
+
+// Убираем ошибку, если всё ок
+MyForm.prototype.disableError = function(el) {
+  this.isValid = true;
+  this.errorFields.splice(this.errorFields.indexOf(el.name), 1);
+  el.classList.remove("error");
   return 0;
 };
 
@@ -35,7 +43,7 @@ MyForm.prototype.nameValidation = function(str) {
     return el.replace(/[^A-Za-zА-Яа-яё]/gim, "");
   });
   if (arrNames.length == 3) {
-    //
+    this.disableError(this.inputFio);
   } else {
     this.throwError(this.inputFio);
   }
@@ -57,13 +65,13 @@ MyForm.prototype.emailValidation = function(str) {
     let flag = 0;
     for (let j = 0; j < emails.length; j++) {
       if (emails[j] == mailProvider[1]) {
-        // убрать класс ошибки
+        this.disableError(this.inputEmail);
         break;
       } else {
         flag++;
       }
     }
-    if (flag == emails.length) this.throwError(this.inputEmail); // Выкинуть ошибку;
+    if (flag == emails.length) this.throwError(this.inputEmail);
   } else {
     this.throwError(this.inputEmail);
   }
@@ -81,16 +89,14 @@ var phoneNumber = new PhoneMask(document.getElementById("phone_mask"), {
 MyForm.prototype.phoneValidation = function(str) {
   let numArray = str.replace(/[^0-9]/gim, "").split(""),
     sumNum = 0;
-  if (numArray.length == 11) {
-    for (var k = 0; k < numArray.length; k++) {
-      sumNum += +numArray[k];
-    }
-    if (sumNum > 30) {
-      this.throwError(this.inputPhone);
-    }
-  } else {
+  if (numArray.length != 11) {
     this.throwError(this.inputPhone);
+    return 0;
   }
+  for (var k = 0; k < numArray.length; k++) sumNum += +numArray[k];
+  sumNum > 30
+    ? this.throwError(this.inputPhone)
+    : this.disableError(this.inputPhone);
 };
 
 // Получаем данные с формы
@@ -111,7 +117,10 @@ MyForm.prototype.setData = function(obj) {
 
 MyForm.prototype.submit = function() {
   this.validate();
-  this.getData();
+  if (this.isValid) {
+    this.button.setAttribute("disabled", true);
+    // Отправляем запрос тут
+  }
 };
 
-let a = new MyForm("myForm");
+let nodeTest = new MyForm("myForm");

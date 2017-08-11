@@ -8,14 +8,12 @@
   <title>Тестовое задание в школу Node.js</title>
 </head>
 <body>
-  <form id="myForm" action="index.html" method="post">
-    <input type="text" name="fio" placeholder="ФИО" value="Смирнов И А">
-    <input type="text" name="email" placeholder="Email" value="hello@ya.ru">
+  <form id="myForm" action="/test2.json" method="post" enctype="multipart/form-data">
+    <input type="text" name="fio" placeholder="ФИО" value="Тест Тест Тест">
+    <input type="text" name="email" placeholder="Email" value="test@ya.ru">
     <input type="text" name="phone" id="phone_mask" placeholder="Номер телефона">
     <button type="button" id="submitButton" name="button">Отправить</button>
-    <div id="resultContainer">
-
-    </div>
+    <div id="resultContainer"></div>
   </form>
 
 

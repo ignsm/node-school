@@ -51,31 +51,10 @@ MyForm.prototype.nameValidation = function(str) {
 
 // Функция обработки Email
 MyForm.prototype.emailValidation = function(str) {
-  let emails = [
-      "ya.ru",
-      "yandex.ru",
-      "yandex.ua",
-      "yandex.by",
-      "yandex.kz",
-      "yandex.com"
-    ],
-    regularEmailChecker = /^(([^<>()\[\]\\.,;:\s@"]+(\.[^<>()\[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
-  if (regularEmailChecker.test(str.replace(" ", ""))) {
-    let mailProvider = str.split("@");
-    let flag = 0;
-    for (let j = 0; j < emails.length; j++) {
-      if (emails[j] == mailProvider[1]) {
-        this.disableError(this.inputEmail);
-        break;
-      } else {
-        flag++;
-      }
-    }
-    if (flag == emails.length) this.throwError(this.inputEmail);
-  } else {
-    this.throwError(this.inputEmail);
-  }
-  return 0;
+  const pattern = /[a-zA-Z0-9.+@]+@(ya\.ru|(yandex\.(ru|ua|by|kz|com)))/;
+  str.match(pattern)
+    ? this.disableError(this.inputEmail)
+    : this.throwError(this.inputEmail);
 };
 
 // Маска ввода телефона
@@ -110,9 +89,11 @@ MyForm.prototype.getData = function() {
 };
 
 MyForm.prototype.setData = function(obj) {
-  this.inputFio.value = obj.fio;
-  this.inputEmail.value = obj.email;
-  this.inputPhone.value = obj.phone;
+  [this.inputFio.value, this.inputEmail.value, this.inputPhone.value] = [
+    obj.fio,
+    obj.email,
+    obj.phone
+  ];
 };
 
 MyForm.prototype.submit = function() {

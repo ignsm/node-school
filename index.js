@@ -12,12 +12,6 @@ function MyForm(id) {
   };
 }
 
-// В глобальной области видимости должен быть определен объект MyForm с методами
-// validate() => { isValid: Boolean, errorFields: String[] }
-// getData() => Object
-// setData(Object) => undefined
-// submit() => undefined
-
 MyForm.prototype.validate = function() {
   let data = this.getData();
   this.nameValidation(data.fio);
@@ -110,10 +104,9 @@ MyForm.prototype.getData = function() {
 };
 
 MyForm.prototype.setData = function(obj) {
-  let inputs = Array.from(this.form.querySelectorAll("input"));
-  for (let i = 0; i < inputs.length; i++) {
-    formData[inputs[i].name] = inputs[i].value;
-  }
+  this.inputFio.value = obj.fio;
+  this.inputEmail.value = obj.email;
+  this.inputPhone.value = obj.phone;
 };
 
 MyForm.prototype.submit = function() {

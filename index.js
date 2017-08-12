@@ -6,39 +6,45 @@ function MyForm(id) {
   this.inputPhone = this.form.querySelector("input[name='phone']");
   this.button = this.form.querySelector("#submitButton");
   this.resultContainer = this.form.querySelector("#resultContainer");
-  this.isValid = false;
+  this.isValid = 1;
   this.errorFields = [];
   this.button.onclick = () => {
     this.submit();
+  };
+  this.inputPhone.onfocus = function() {
+    var phoneNumber = new PhoneMask(this, {
+      pattern: "+7(___)___-__-__",
+      patternChar: "_",
+      allowedRegExp: /^\d$/
+    });
   };
 }
 
 MyForm.prototype.validate = function() {
   let data = this.getData();
-  if (
-    this.nameValidation(data.fio) &&
-    this.emailValidation(data.email) &&
-    this.phoneValidation(data.phone)
-  ) {
-    this.isValid = true;
+  this.errorFields = [];
+  if (!this.nameValidation(data.fio)) {
+    this.isValid = 0;
+    this.errorFields.push("fio");
+  } else this.inputFio.classList.remove("error");
+  if (!this.emailValidation(data.email)) {
+    this.isValid = 0;
+    this.errorFields.push("email");
+  } else this.inputEmail.classList.remove("error");
+  if (!this.phoneValidation(data.phone)) {
+    this.isValid = 0;
+    this.errorFields.push("phone");
+  } else this.inputPhone.classList.remove("error");
+  if (this.errorFields.length) {
+    this.errorFields.forEach(name =>
+      this.form
+        .querySelector("input[name='" + name + "']")
+        .classList.add("error")
+    );
+    return 0;
   } else {
-    this.isValid = false;
+    return (this.isValid = 1);
   }
-  return { isValid: this.isValid, errorFields: this.errorFields };
-};
-
-// Функция вызова ошибки
-MyForm.prototype.throwError = function(el) {
-  this.errorFields.push(el.name);
-  el.classList.add("error");
-  return 0;
-};
-
-// Убираем ошибку, если всё ок
-MyForm.prototype.disableError = function(el) {
-  this.errorFields.splice(this.errorFields.indexOf(el.name), 1);
-  el.classList.remove("error");
-  return 0;
 };
 
 // Функция обработки ФИО
@@ -46,50 +52,22 @@ MyForm.prototype.nameValidation = function(str) {
   let arrNames = str.split(" ").filter(el => {
     return el.replace(/[^A-Za-zА-Яа-яё]/gim, "");
   });
-  if (arrNames.length == 3) {
-    this.disableError(this.inputFio);
-    return (this.inputFio.isValid = true);
-  } else {
-    this.throwError(this.inputFio);
-    return (this.inputFio.isValid = false);
-  }
+  return arrNames.length == 3;
 };
 
 // Функция обработки Email
 MyForm.prototype.emailValidation = function(str) {
   const pattern = /[a-zA-Z0-9.+@]+@(ya\.ru|(yandex\.(ru|ua|by|kz|com)))/;
-  if (str.match(pattern)) {
-    this.disableError(this.inputEmail);
-    return (this.inputEmail.isValid = true);
-  } else {
-    this.throwError(this.inputEmail);
-    return (this.inputEmail.isValid = false);
-  }
+  return Boolean(str.match(pattern));
 };
-
-// Маска ввода телефона
-var phoneNumber = new PhoneMask(document.getElementById("phone_mask"), {
-  pattern: "+7(___)___-__-__",
-  patternChar: "_",
-  allowedRegExp: /^\d$/
-});
 
 // Валидируем номер телефона
 MyForm.prototype.phoneValidation = function(str) {
   let numArray = str.replace(/[^0-9]/gim, "").split(""),
     sumNum = 0;
-  if (numArray.length != 11) {
-    this.throwError(this.inputPhone);
-    return (this.inputPhone.isValid = false);
-  }
+  if (numArray.length != 11) return (this.inputPhone.isValid = false);
   for (var k = 0; k < numArray.length; k++) sumNum += +numArray[k];
-  if (sumNum > 30) {
-    this.throwError(this.inputPhone);
-    return (this.inputPhone.isValid = false);
-  } else {
-    this.disableError(this.inputPhone);
-    return (this.inputPhone.isValid = true);
-  }
+  return sumNum < 30;
 };
 
 // Получаем данные с формы
@@ -103,18 +81,14 @@ MyForm.prototype.getData = function() {
 };
 
 MyForm.prototype.setData = function(obj) {
-  [this.inputFio.value, this.inputEmail.value, this.inputPhone.value] = [
-    obj.fio,
-    obj.email,
-    obj.phone
-  ];
+  this.inputFio.value = obj.fio;
+  this.inputEmail.value = obj.email;
+  this.inputPhone.value = obj.phone;
 };
 
 MyForm.prototype.sendRequest = function() {
   var request = new XMLHttpRequest();
-  // console.log(this.form);
-  let action = this.form.getAttribute("action");
-  request.open("GET", action);
+  request.open("GET", this.form.action);
   request.send();
   request.onreadystatechange = function() {
     if (request.readyState != 4) return 0;
@@ -146,4 +120,4 @@ MyForm.prototype.submit = function() {
   }
 };
 
-let nodeTest = new MyForm("myForm");
+let form = new MyForm("myForm");

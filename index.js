@@ -6,7 +6,7 @@ function MyForm(id) {
   this.inputPhone = this.form.querySelector("input[name='phone']");
   this.button = this.form.querySelector("#submitButton");
   this.resultContainer = this.form.querySelector("#resultContainer");
-  this.isValid = true;
+  this.isValid = false;
   this.errorFields = [];
   this.button.onclick = () => {
     this.submit();
@@ -15,15 +15,20 @@ function MyForm(id) {
 
 MyForm.prototype.validate = function() {
   let data = this.getData();
-  this.nameValidation(data.fio);
-  this.emailValidation(data.email);
-  this.phoneValidation(data.phone);
+  if (
+    this.nameValidation(data.fio) &&
+    this.emailValidation(data.email) &&
+    this.phoneValidation(data.phone)
+  ) {
+    this.isValid = true;
+  } else {
+    this.isValid = false;
+  }
   return { isValid: this.isValid, errorFields: this.errorFields };
 };
 
 // Функция вызова ошибки
 MyForm.prototype.throwError = function(el) {
-  this.isValid = false;
   this.errorFields.push(el.name);
   el.classList.add("error");
   return 0;
@@ -31,7 +36,6 @@ MyForm.prototype.throwError = function(el) {
 
 // Убираем ошибку, если всё ок
 MyForm.prototype.disableError = function(el) {
-  this.isValid = true;
   this.errorFields.splice(this.errorFields.indexOf(el.name), 1);
   el.classList.remove("error");
   return 0;
@@ -44,17 +48,23 @@ MyForm.prototype.nameValidation = function(str) {
   });
   if (arrNames.length == 3) {
     this.disableError(this.inputFio);
+    return (this.inputFio.isValid = true);
   } else {
     this.throwError(this.inputFio);
+    return (this.inputFio.isValid = false);
   }
 };
 
 // Функция обработки Email
 MyForm.prototype.emailValidation = function(str) {
   const pattern = /[a-zA-Z0-9.+@]+@(ya\.ru|(yandex\.(ru|ua|by|kz|com)))/;
-  str.match(pattern)
-    ? this.disableError(this.inputEmail)
-    : this.throwError(this.inputEmail);
+  if (str.match(pattern)) {
+    this.disableError(this.inputEmail);
+    return (this.inputEmail.isValid = true);
+  } else {
+    this.throwError(this.inputEmail);
+    return (this.inputEmail.isValid = false);
+  }
 };
 
 // Маска ввода телефона
@@ -70,12 +80,16 @@ MyForm.prototype.phoneValidation = function(str) {
     sumNum = 0;
   if (numArray.length != 11) {
     this.throwError(this.inputPhone);
-    return 0;
+    return (this.inputPhone.isValid = false);
   }
   for (var k = 0; k < numArray.length; k++) sumNum += +numArray[k];
-  sumNum > 30
-    ? this.throwError(this.inputPhone)
-    : this.disableError(this.inputPhone);
+  if (sumNum > 30) {
+    this.throwError(this.inputPhone);
+    return (this.inputPhone.isValid = false);
+  } else {
+    this.disableError(this.inputPhone);
+    return (this.inputPhone.isValid = true);
+  }
 };
 
 // Получаем данные с формы

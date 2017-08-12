@@ -114,7 +114,28 @@ MyForm.prototype.submit = function() {
   this.validate();
   if (this.isValid) {
     this.button.setAttribute("disabled", true);
-    // Отправляем запрос тут
+    var request = new XMLHttpRequest();
+    let action = this.form.getAttribute("action");
+    request.open("GET", action);
+    request.send();
+    request.onreadystatechange = function() {
+      if (request.readyState != 4) return;
+
+      if (request.status != 200) {
+        console.log(request.status + ": " + request.statusText);
+      } else {
+        let resp = JSON.parse(request.responseText);
+        if (resp.status == "success") {
+          this.resultContainer.className += " success";
+          this.resultContainer.innerHTML = "Success";
+        } else if (resp.status == "error") {
+          this.resultContainer.className += " error";
+          this.resultContainer.innerHTML = resp.reason;
+        } else if (resp.status == "progress") {
+          setTimeout(this.makeRequest, resp.timeout);
+        }
+      }
+    };
   }
 };
 

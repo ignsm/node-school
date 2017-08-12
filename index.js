@@ -110,32 +110,39 @@ MyForm.prototype.setData = function(obj) {
   ];
 };
 
+MyForm.prototype.sendRequest = function() {
+  var request = new XMLHttpRequest();
+  // console.log(this.form);
+  let action = this.form.getAttribute("action");
+  request.open("GET", action);
+  request.send();
+  request.onreadystatechange = function() {
+    if (request.readyState != 4) return 0;
+    if (request.status != 200) {
+      console.log(request.status + ": " + request.statusText);
+    } else {
+      let resp = JSON.parse(request.responseText);
+      if (resp.status == "success") {
+        el.classList.remove("progress");
+        this.resultContainer.className += " success";
+        this.resultContainer.innerHTML = "Success";
+      } else if (resp.status == "error") {
+        el.classList.remove("progress");
+        this.resultContainer.className += " error";
+        this.resultContainer.innerHTML = resp.reason;
+      } else if (resp.status == "progress") {
+        this.resultContainer.className += "progress";
+        setTimeout(this.sendRequest.bind(this), resp.timeout);
+      }
+    }
+  }.bind(this);
+};
+
 MyForm.prototype.submit = function() {
   this.validate();
   if (this.isValid) {
     this.button.setAttribute("disabled", true);
-    var request = new XMLHttpRequest();
-    let action = this.form.getAttribute("action");
-    request.open("GET", action);
-    request.send();
-    request.onreadystatechange = function() {
-      if (request.readyState != 4) return;
-
-      if (request.status != 200) {
-        console.log(request.status + ": " + request.statusText);
-      } else {
-        let resp = JSON.parse(request.responseText);
-        if (resp.status == "success") {
-          this.resultContainer.className += " success";
-          this.resultContainer.innerHTML = "Success";
-        } else if (resp.status == "error") {
-          this.resultContainer.className += " error";
-          this.resultContainer.innerHTML = resp.reason;
-        } else if (resp.status == "progress") {
-          setTimeout(this.makeRequest, resp.timeout);
-        }
-      }
-    };
+    this.sendRequest();
   }
 };
 

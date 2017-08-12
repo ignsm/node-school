@@ -1,4 +1,3 @@
-// Глобальный объект MyForm
 function MyForm(id) {
   this.form = document.getElementById(id);
   this.inputFio = this.form.querySelector("input[name='fio']");
@@ -20,48 +19,27 @@ function MyForm(id) {
   };
 }
 
-MyForm.prototype.validate = function() {
-  let data = this.getData();
-  this.errorFields = [];
-  if (!this.nameValidation(data.fio)) {
-    this.isValid = 0;
-    this.errorFields.push("fio");
-  } else this.inputFio.classList.remove("error");
-  if (!this.emailValidation(data.email)) {
-    this.isValid = 0;
-    this.errorFields.push("email");
-  } else this.inputEmail.classList.remove("error");
-  if (!this.phoneValidation(data.phone)) {
-    this.isValid = 0;
-    this.errorFields.push("phone");
-  } else this.inputPhone.classList.remove("error");
-  if (this.errorFields.length) {
-    this.errorFields.forEach(name =>
-      this.form
-        .querySelector("input[name='" + name + "']")
-        .classList.add("error")
-    );
-    return 0;
-  } else {
-    return (this.isValid = 1);
-  }
-};
-
-// Функция обработки ФИО
+// Функции валидации полей
 MyForm.prototype.nameValidation = function(str) {
   let arrNames = str.split(" ").filter(el => {
     return el.replace(/[^A-Za-zА-Яа-яё]/gim, "");
   });
   return arrNames.length == 3;
 };
-
-// Функция обработки Email
 MyForm.prototype.emailValidation = function(str) {
-  const pattern = /[a-zA-Z0-9.+@]+@(ya\.ru|(yandex\.(ru|ua|by|kz|com)))/;
-  return Boolean(str.match(pattern));
+  let emails = [
+      "ya.ru",
+      "yandex.ru",
+      "yandex.ua",
+      "yandex.by",
+      "yandex.kz",
+      "yandex.com"
+    ],
+    regularEmailChecker = /^(([^<>()\[\]\\.,;:\s@"]+(\.[^<>()\[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
+  return Boolean(
+    regularEmailChecker.test(this.inputEmail.value.replace(" ", ""))
+  );
 };
-
-// Валидируем номер телефона
 MyForm.prototype.phoneValidation = function(str) {
   let numArray = str.replace(/[^0-9]/gim, "").split(""),
     sumNum = 0;
@@ -70,7 +48,6 @@ MyForm.prototype.phoneValidation = function(str) {
   return sumNum < 30;
 };
 
-// Получаем данные с формы
 MyForm.prototype.getData = function() {
   let formData = {},
     inputs = Array.from(this.form.querySelectorAll("input"));
@@ -78,6 +55,30 @@ MyForm.prototype.getData = function() {
     formData[inputs[i].name] = inputs[i].value;
   }
   return formData;
+};
+
+MyForm.prototype.validate = function() {
+  let data = this.getData();
+  this.errorFields = [];
+  if (!this.nameValidation(data.fio)) {
+    this.errorFields.push("fio");
+  } else this.inputFio.classList.remove("error");
+  if (!this.emailValidation(data.email)) {
+    this.errorFields.push("email");
+  } else this.inputEmail.classList.remove("error");
+  if (!this.phoneValidation(data.phone)) {
+    this.errorFields.push("phone");
+  } else this.inputPhone.classList.remove("error");
+  if (this.errorFields.length) {
+    this.errorFields.forEach(name =>
+      this.form
+        .querySelector("input[name='" + name + "']")
+        .classList.add("error")
+    );
+    return (this.isValid = 0);
+  } else {
+    return (this.isValid = 1);
+  }
 };
 
 MyForm.prototype.setData = function(obj) {

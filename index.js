@@ -75,9 +75,9 @@ MyForm.prototype.validate = function() {
         .querySelector("input[name='" + name + "']")
         .classList.add("error")
     );
-    return (this.isValid = 0);
+    return (this.isValid = false);
   } else {
-    return (this.isValid = 1);
+    return (this.isValid = true);
   }
 };
 
@@ -88,7 +88,7 @@ MyForm.prototype.setData = function(obj) {
 };
 
 MyForm.prototype.sendRequest = function() {
-  var request = new XMLHttpRequest();
+  let request = new XMLHttpRequest();
   request.open("GET", this.form.action);
   request.send();
   request.onreadystatechange = function() {

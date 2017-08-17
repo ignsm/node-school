@@ -87,10 +87,11 @@ MyForm.prototype.setData = function(obj) {
   this.inputPhone.value = obj.phone;
 };
 
-MyForm.prototype.sendRequest = function() {
+MyForm.prototype.sendRequest = function(data) {
   let request = new XMLHttpRequest();
-  request.open("GET", this.form.action);
-  request.send();
+  request.open("POST", this.form.action);
+  request.setRequestHeader("Content-type", "application/json; charset=utf-8");
+  request.send(data);
   request.onreadystatechange = function() {
     if (request.readyState != 4) return 0;
     if (request.status != 200) {
@@ -107,7 +108,7 @@ MyForm.prototype.sendRequest = function() {
         this.resultContainer.innerHTML = resp.reason;
       } else if (resp.status == "progress") {
         this.resultContainer.className += "progress";
-        setTimeout(this.sendRequest.bind(this), resp.timeout);
+        setTimeout(this.sendRequest.bind(this, data), resp.timeout);
       }
     }
   }.bind(this);
@@ -116,8 +117,9 @@ MyForm.prototype.sendRequest = function() {
 MyForm.prototype.submit = function() {
   this.validate();
   if (this.isValid) {
+    let data = JSON.stringify(this.getData());
     this.button.setAttribute("disabled", true);
-    this.sendRequest();
+    this.sendRequest(data);
   }
 };
 

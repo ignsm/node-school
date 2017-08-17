@@ -75,9 +75,11 @@ MyForm.prototype.validate = function() {
         .querySelector("input[name='" + name + "']")
         .classList.add("error")
     );
-    return (this.isValid = false);
+    this.isValid = false;
+    return { isValid: false, errorFields: this.errorFields };
   } else {
-    return (this.isValid = true);
+    this.isValid = true;
+    return { isValid: true, errorFields: this.errorFields };
   }
 };
 

@@ -45,7 +45,7 @@ MyForm.prototype.phoneValidation = function(str) {
     sumNum = 0;
   if (numArray.length != 11) return (this.inputPhone.isValid = false);
   for (var k = 0; k < numArray.length; k++) sumNum += +numArray[k];
-  return sumNum < 30;
+  return sumNum <= 30;
 };
 
 MyForm.prototype.getData = function() {
